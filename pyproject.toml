@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "dawgatron"
+version = "0.1.0"
+description = "general purpose discord buddy"
+authors = ["te <thrzl@icloud.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+py-cord = "^2.4.1"
+jishaku = "^2.5.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.9.1"
+ruff = "^0.0.289"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
