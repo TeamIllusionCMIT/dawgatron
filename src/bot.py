@@ -42,7 +42,7 @@ class DawgtaviousVandross(Bot):
         print("------")
 
     async def on_member_join(self, member: Member):
-        if not self.redis.sismember(member.id) and self.redis.hget("config", "lock"):
+        if not self.redis.sismember("whitelist", member.name) and self.redis.hget("config", "lock"):
             await member.send(embed=self.kick_embed)
             await member.kick(reason="server is locked")
             print(f"[x] kicked {member.name} ({member.id})")
