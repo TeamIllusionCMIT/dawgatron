@@ -1,31 +1,51 @@
-from discord.bot import Bot
-from discord import Intents, MemberCacheFlags
+from discord.ext.bridge import Bot
+from discord import Intents, MemberCacheFlags, Member, Embed
+from redis.asyncio import Redis
+
 
 class DawgtaviousVandross(Bot):
-    def __init__(self, token: str):
-        if not token:
-            raise ValueError(
-                "no discord API token provided; set the TOKEN environment variable or pass one into the bot"
-            )
+    __slots__ = ("redis", "token", "kick_embed")
 
+    def __init__(self, token: str, redis_url: str):
+        self.redis = Redis.from_url(redis_url)
+
+        # turn off all but a few intents to save bandwith and resources
         intents = Intents.none()
         intents.message_content = True
         intents.guild_messages = True
         intents.members = True
 
+        # we dont need to cache members so turn it off to save memory
         member_cache_flags = MemberCacheFlags.none()
-        member_cache_flags.joined = True
+
+        # build the embed notifying people how and why they were kicked
+        # we can do it in advance just to be more efficient
+
+        self.kick_embed = (
+            Embed(
+                description="you aren't whitelisted in this server! ask someone in the server to whitelist your username."
+            )
+            .set_author("server security")
+            .set_footer("with love, dawgtavious vandross")
+        )
+        self.kick_embed.color = 0x2F3136
 
         super().__init__(
-            command_prefix="dawg ",
+            command_prefix="dawg ",  # for using jishaku
             member_cache_flags=member_cache_flags,
             intents=intents,
         )
         self.token = token
 
     async def on_ready(self):
-        print(f"logged in as {self.user.name} ({self.user.id})")
+        print(f"[i] logged in as {self.user.name} ({self.user.id})")
         print("------")
+
+    async def on_member_join(self, member: Member):
+        if not self.redis.sismember(member.id) and self.redis.hget("config", "lock"):
+            await member.send(embed=self.kick_embed)
+            await member.kick(reason="server is locked")
+            print(f"[x] kicked {member.name} ({member.id})")
 
     def run(self):
         super().run(self.token)
