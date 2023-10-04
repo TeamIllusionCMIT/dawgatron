@@ -1,5 +1,5 @@
 from discord.ext.commands.cog import Cog
-from discord import ApplicationContext, Member
+from discord import ApplicationContext
 from .bot import DawgtaviousVandross
 from discord.ext.commands import slash_command
 
@@ -9,14 +9,6 @@ class Commands(Cog):
 
     def __init__(self, bot: DawgtaviousVandross):
         self.bot = bot
-
-    @Cog.listener("on_member_join")
-    async def ban_unwhitelisted(self, member: Member):
-        if await self.bot.redis.hget("config", "lock") and not await self.bot.redis.sismember(
-            "whitelist", member.name
-        ):
-            await member.send(self.bot._build_kick_embed())
-            await member.kick(reason="server is locked")
 
     @slash_command(description="add a user to the whitelist")
     async def whitelist(self, ctx: ApplicationContext, user: str):
@@ -34,7 +26,7 @@ class Commands(Cog):
 
     @slash_command(description="list all whitelisted users")
     async def whitelist_list(self, ctx: ApplicationContext):
-        await ctx.respond(", ".join(self.bot.redis.smembers("whitelist")), ephemeral=True)
+        await ctx.respond(", ".join(member.decode() for member in await self.bot.redis.smembers("whitelist")), ephemeral=True)
 
     @slash_command(description="check if a user is whitelisted")
     async def whitelist_check(self, ctx: ApplicationContext, user: str):
@@ -46,14 +38,14 @@ class Commands(Cog):
     async def lock(self, ctx: ApplicationContext):
         if await self.bot.redis.hget("config", "lock"):
             return await ctx.respond("the server is already locked.")
-        await self.bot.redis.hset("config", "lock", True)
+        await self.bot.redis.hset("config", "lock", 1)
         await ctx.respond("locked the server.")
 
     @slash_command(description="unlock the server")
     async def unlock(self, ctx: ApplicationContext):
         if not await self.bot.redis.hget("config", "lock"):
             return await ctx.respond("the server is not locked.")
-        await self.bot.redis.hset("config", "lock", True)
+        await self.bot.redis.hset("config", "lock", 1)
         await ctx.respond("unlocked the server.")
 
     @slash_command(description="add all current members to the whitelist")

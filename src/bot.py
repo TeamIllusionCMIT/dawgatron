@@ -26,7 +26,6 @@ class DawgtaviousVandross(Bot):
                 description="you aren't whitelisted in this server! ask someone in the server to whitelist your username."
             )
             .set_author(name="server security")
-            .set_footer(text="with love, dawgtavious vandross")
         )
         self.kick_embed.color = 0x2F3136 # type: ignore
 
@@ -40,6 +39,7 @@ class DawgtaviousVandross(Bot):
     async def on_ready(self):
         print(f"[i] logged in as {self.user.name} ({self.user.id})")
         print("------")
+        self.kick_embed.set_footer(text=f"with love, {self.user.name}")
 
     async def on_member_join(self, member: Member):
         if not await self.redis.sismember("whitelist", member.name) and await self.redis.hget("config", "lock"):
