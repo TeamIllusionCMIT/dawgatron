@@ -25,10 +25,10 @@ class DawgtaviousVandross(Bot):
             Embed(
                 description="you aren't whitelisted in this server! ask someone in the server to whitelist your username."
             )
-            .set_author("server security")
-            .set_footer("with love, dawgtavious vandross")
+            .set_author(name="server security")
+            .set_footer(text="with love, dawgtavious vandross")
         )
-        self.kick_embed.color = 0x2F3136
+        self.kick_embed.color = 0x2F3136 # type: ignore
 
         super().__init__(
             command_prefix="dawg ",  # for using jishaku
