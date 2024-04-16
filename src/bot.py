@@ -14,6 +14,7 @@ class DawgtaviousVandross(Bot):
         intents.message_content = True
         intents.guild_messages = True
         intents.members = True
+        intents.guilds = True
 
         # we dont need to cache members so turn it off to save memory
         member_cache_flags = MemberCacheFlags.none()
@@ -39,13 +40,15 @@ class DawgtaviousVandross(Bot):
     async def on_ready(self):
         print(f"[i] logged in as {self.user.name} ({self.user.id})")
         print("------")
-        self.kick_embed.set_footer(text=f"with love, {self.user.name}")
+        self.kick_embed.set_footer(text=f"womp womp, {self.user.name}")
 
     async def on_member_join(self, member: Member):
         if not await self.redis.sismember("whitelist", member.name) and await self.redis.hget("config", "lock"):
             await member.send(embed=self.kick_embed)
             await member.kick(reason="server is locked")
             print(f"[x] kicked {member.name} ({member.id})")
+
+
 
     def run(self):
         super().run(self.token)
