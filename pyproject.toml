@@ -1,23 +1,29 @@
-[tool.poetry]
+[project]
 name = "dawgatron"
 version = "0.1.0"
-description = "general purpose discord buddy"
-authors = ["te <thrzl@icloud.com>"]
-license = "MIT"
+description = "ban people who aren't supposed to be here"
+dependencies = [
+    "py-cord>=2.5.0",
+    "jishaku>=2.5.2",
+    "redis>=5.0.3",
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.11"
-py-cord = "^2.4.1"
-jishaku = "^2.5.1"
-redis = "^5.0.0"
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.9.1"
-ruff = "^0.0.289"
-mypy = "^1.5.1"
+requires-python = ">= 3.8"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "black>=24.4.0",
+    "ruff>=0.3.7",
+    "mypy>=1.9.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dawgatron"]
